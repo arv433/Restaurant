@@ -15,11 +15,9 @@ class CategoryTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        MenuController.shared.fetchCategories() { (categories) in
-            if let categories = categories {
-                self.updateUI(with: categories)
-            }
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: MenuController.menuUpdateNotification, object: nil)
+
+        updateUI()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -27,11 +25,9 @@ class CategoryTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
     
-    func updateUI(with categories: [String]) {
-        DispatchQueue.main.async {
-            self.categories = categories
-            self.tableView.reloadData()
-        }
+    @objc func updateUI() {
+        categories = MenuController.shared.categories
+        self.tableView.reloadData()
     }
 
     // MARK: - Table view data source

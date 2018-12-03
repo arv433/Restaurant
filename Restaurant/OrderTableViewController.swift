@@ -121,8 +121,6 @@ class OrderTableViewController: UITableViewController {
         MenuController.shared.notificationCenter.add(request) { (error) in
             if let error = error {
                 print(error)
-            } else {
-                print("Request should probably be added to shared notifications center")
             }
         }
     }
