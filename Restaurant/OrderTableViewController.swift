@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class OrderTableViewController: UITableViewController {
 
@@ -70,7 +71,6 @@ class OrderTableViewController: UITableViewController {
         }    
     }
 
-
     @IBAction func submitTapped(_ sender: UIBarButtonItem) {
         let orderTotal = MenuController.shared.order.menuItems.reduce(0.0) {
             (result, menuItem) -> Double in
@@ -100,7 +100,29 @@ class OrderTableViewController: UITableViewController {
                 if let minutes = minutes {
                     self.orderMinutes = minutes
                     self.performSegue(withIdentifier: "ConfirmationSegue", sender: nil)
+                    self.setNotification(withMinutes: minutes)
                 }
+            }
+        }
+    }
+    
+    func setNotification(withMinutes minutes: Int) {
+        // set content
+        let notificationContent = UNMutableNotificationContent()
+        notificationContent.title = "Your order will be ready soon"
+        notificationContent.body = "10 minutes until your order is ready for pickup"
+        notificationContent.sound = UNNotificationSound.default
+
+        // create and schedule notification
+        let triggerInterval = (Double(minutes) * 60.0) - 600.0
+        let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval, repeats: false)
+        let notificationIdentifier = "UYLocalNotification"
+        let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: notificationTrigger)
+        MenuController.shared.notificationCenter.add(request) { (error) in
+            if let error = error {
+                print(error)
+            } else {
+                print("Request should probably be added to shared notifications center")
             }
         }
     }

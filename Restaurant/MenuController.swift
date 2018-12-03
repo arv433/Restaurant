@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import UserNotifications
 
 class MenuController {
     
     static let shared = MenuController()
 
     static let orderUpdateNotification = Notification.Name("MenuController.orderUpdated")
+    
+    let notificationCenter = UNUserNotificationCenter.current()
 
     let baseURL = URL(string: "http://localhost:8090")!
 
@@ -27,7 +30,9 @@ class MenuController {
         
         let task = URLSession.shared.dataTask(with: categoryURL) { (data, response, error) in
             if let error = error {
-                print(error)
+                let httpResponse = response as? HTTPURLResponse
+                let nsError = NSError(domain: self.baseURL.absoluteString, code: (httpResponse?.statusCode)!, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
+                print(nsError)
                 completion(nil)
             } else if let data = data, let jsonDictionary = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let categories = jsonDictionary?["categories"] as? [String] {
                 completion(categories)
@@ -47,7 +52,9 @@ class MenuController {
         let task = URLSession.shared.dataTask(with: menuURL) { (data, response, error) in
             let jsonDecoder = JSONDecoder()
             if let error = error {
-                print(error)
+                let httpResponse = response as? HTTPURLResponse
+                let nsError = NSError(domain: self.baseURL.absoluteString, code: (httpResponse?.statusCode)!, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
+                print(nsError)
                 completion(nil)
             } else if let data = data, let menuItems = try? jsonDecoder.decode(MenuItems.self, from: data) {
                 completion(menuItems.items)
@@ -72,7 +79,9 @@ class MenuController {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error ) in
             let jsonDecoder = JSONDecoder()
             if let error = error {
-                print(error)
+                let httpResponse = response as? HTTPURLResponse
+                let nsError = NSError(domain: self.baseURL.absoluteString, code: (httpResponse?.statusCode)!, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
+                print(nsError)
                 completion(nil)
             } else if let data = data, let preparationTime = try? jsonDecoder.decode(PreparationTime.self, from: data) {
                 completion(preparationTime.prepTime)
@@ -84,7 +93,9 @@ class MenuController {
     func fetchImage(url: URL, completion: @escaping (UIImage?) -> Void) {
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
-                print(error)
+                let httpResponse = response as? HTTPURLResponse
+                let nsError = NSError(domain: self.baseURL.absoluteString, code: (httpResponse?.statusCode)!, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
+                print(nsError)
                 completion(nil)
             } else if let data = data, let image = UIImage(data: data) {
                 completion(image)
